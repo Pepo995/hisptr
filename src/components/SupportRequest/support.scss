@@ -1,0 +1,256 @@
+@import "@styles/scss/style.scss";
+.sc-AxhCb.sc-fznZeY.dVrMrf.rdt_TableCol {
+  display: none !important;
+}
+.sc-AxhCb.sc-AxheI.UXnxA.rdt_TableCell {
+  display: none !important;
+}
+.sc-AxirZ.jxdJuC.rdt_TableHead {
+  border-top: 1px solid #ebe9f1;
+}
+
+.post-name {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #b9b9c3 !important;
+}
+.support-header {
+  @include sm {
+    flex-wrap: wrap;
+    margin-top: 15px;
+  }
+  .status-select {
+    @include sm {
+      margin-top: 15px;
+    }
+  }
+}
+.remove-bg-badge {
+  background-color: transparent !important;
+}
+.bg-light-warning {
+  color: #fe9800 !important;
+}
+.icon-bg {
+  background: rgba(254, 152, 0, 0.2) !important;
+}
+
+// react table css
+.react-dataTable {
+  border-radius: 0;
+  .rdt_TableHead {
+    .rdt_TableHeadRow {
+      background-color: transparent !important;
+      border-top: 1px solid;
+      border-color: #ebe9f1;
+      min-height: 0;
+      height: 38px;
+
+      .rdt_TableCol {
+        padding: 0.72rem 1.5rem;
+        .rdt_TableCol_Sortable {
+          font-weight: 600;
+          font-size: 12px;
+          line-height: 15px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: #5e5873;
+        }
+      }
+    }
+  }
+
+  .rdt_TableBody {
+    .rdt_TableRow {
+      // cursor: pointer;
+      .rdt_TableCell {
+        height: 53px;
+        padding: 0.72rem 1.5rem;
+        color: $sy-black;
+        .column-action {
+          svg {
+            stroke: #b9b9c3;
+          }
+
+          .dropdown-item:hover {
+            svg {
+              stroke: $primary;
+            }
+          }
+
+          .dropdown-item:active {
+            svg {
+              stroke: $sy-white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .table-name {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 21px;
+    color: #5e5873;
+  }
+}
+.partner-name {
+  position: absolute;
+  top: 5px;
+  padding: 8px;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  font-size: 0.786rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $primary;
+  border-radius: 100%;
+  color: $sy-white;
+}
+
+.ticket-header {
+  background-color: $sy-black;
+}
+.chat-box {
+  background-color: rgba(2, 0, 0, 0.05);
+  border-radius: 0px 20px 20px 20px;
+}
+.chat-box-2 {
+  background: rgba(253, 111, 110, 0.08);
+  border-radius: 20px 20px 0px 20px;
+  margin-left: auto;
+}
+.chat-box-footer {
+  .chat-input {
+    border: none;
+    // border-left-color: transparent;
+    // border-right-color: transparent;
+  }
+  .chat-input-group {
+    border: none;
+    // border-right-color: transparent;
+    // border-radius: 0%;
+  }
+  .custom-btn-clip {
+    border-radius: 50%;
+    min-height: 40px;
+    height: 40px;
+    background-color: $sy-black !important;
+    box-sizing: border-box;
+    padding: 12px 12px;
+    color: $sy-white !important;
+    min-width: 40px;
+    border-color: black !important;
+  }
+}
+.link-color {
+  color: #5e5873;
+  &:hover {
+    color: #5e5873;
+  }
+}
+.select-option {
+  padding-top: 6px;
+}
+.chat-card {
+  min-height: 654px;
+  max-height: 654px;
+  overflow: auto;
+  display: flex !important;
+  flex-direction: column-reverse;
+}
+.chat-img {
+  width: 20%;
+  border-radius: 50%;
+}
+.image-height-auto {
+  height: auto;
+}
+
+//
+.border-right {
+  border-right-color: transparent;
+  background-color: transparent !important;
+  opacity: 1 !important;
+  &:focus {
+    border-right-color: transparent !important;
+  }
+}
+.flatpickr-day.selected,
+.flatpickr-day.startRange {
+  background-color: $primary !important;
+  border-color: $primary !important;
+}
+.avatar-count {
+  width: 32px;
+  height: 32px;
+  background: rgba(253, 111, 110, 0.12);
+  border-radius: 50%;
+  padding: 8px 8px;
+}
+.react-dataTable-support {
+  border-radius: 0;
+  .rdt_TableHead {
+    .rdt_TableHeadRow {
+      background-color: transparent !important;
+      border-top: 1px solid;
+      border-color: #ebe9f1;
+      min-height: 0;
+      height: 38px;
+
+      .rdt_TableCol {
+        padding: 0.72rem 1.5rem;
+        .rdt_TableCol_Sortable {
+          font-weight: 600;
+          font-size: 12px;
+          line-height: 15px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: #5e5873;
+        }
+      }
+    }
+  }
+
+  .rdt_TableBody {
+    .rdt_TableRow {
+      // cursor: pointer;
+      .rdt_TableCell {
+        height: 53px;
+        padding: 0.72rem 1.5rem;
+        color: $sy-black;
+        .column-action {
+          svg {
+            stroke: #b9b9c3;
+          }
+
+          .dropdown-item:hover {
+            svg {
+              stroke: $primary;
+            }
+          }
+
+          .dropdown-item:active {
+            svg {
+              stroke: $sy-white;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .table-name {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 21px;
+    color: #5e5873;
+  }
+}

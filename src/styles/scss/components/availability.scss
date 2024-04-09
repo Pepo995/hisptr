@@ -1,0 +1,43 @@
+.action {
+    width: 85px;
+    height: 28px;
+    background: #fd6f6e;
+    border-radius: 17px;
+    color: white;
+    padding: 6px 20px;
+}
+// [data-column-id="2"].rdt_TableCol {
+//   .status{
+//    justify-content: space-around !important;
+//   }
+//   }
+.cu-badge {
+    padding: 11px 41px;
+}
+.react-dataTable-availability {
+    .rdt_TableHead {
+        //for sticky last col head
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 15px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #5e5873;
+        .rdt_TableCol:nth-child(9) {
+            position: sticky;
+            right: 0;
+            background-color: white;
+        }
+    }
+    .rdt_TableBody {
+        .rdt_TableCell:nth-child(9) {
+            position: sticky;
+            right: 0;
+            background: inherit;
+        }
+    }
+}
+.select-date-sort {
+    width: 100%;
+    min-width: 203px;
+}

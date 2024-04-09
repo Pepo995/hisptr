@@ -1,0 +1,35 @@
+.notification {
+  border: 1px solid #ebe9f1;
+  padding: 1rem;
+  background: #ffffff;
+  position: relative;
+  &:hover {
+    background: rgba(253, 111, 110, 0.06);
+  }
+  .pending-notification {
+    position: relative;
+    .pending-review {
+      position: absolute;
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: $primary;
+      right: 0;
+      top: 0;
+    }
+  }
+}
+
+.desktop {
+  display: block;
+  @include sm {
+    display: none;
+  }
+}
+.mobile {
+  display: none;
+  @include sm {
+    display: block;
+  }
+}

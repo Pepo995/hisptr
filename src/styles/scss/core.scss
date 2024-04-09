@@ -1,0 +1,55 @@
+@import "./base/bootstrap.scss";
+@import "./base/bootstrap-extended.scss";
+@import "./base/colors.scss";
+@import "./base/components.scss";
+
+// Themes
+@import "./base/themes/dark-layout.scss";
+@import "./base/themes/bordered-layout.scss";
+@import "./base/themes/semi-dark-layout.scss";
+
+// React Specific
+@import "react/index";
+
+@import "./components/autocomplete.scss";
+@import "./components/availability.scss";
+@import "./components/blog.scss";
+@import "./components/drag-n-drop.scss";
+@import "./components/home.scss";
+@import "./components/event-card.scss";
+@import "./components/event.scss";
+@import "./components/faq.scss";
+@import "./components/header.scss";
+@import "./components/media-list.scss";
+@import "./components/member.scss";
+@import "./components/message.scss";
+@import "./components/my-account.scss";
+@import "./components/notification.scss";
+@import "./components/partner-notification.scss";
+@import "./components/partner.scss";
+@import "./components/resources.scss";
+@import "./components/role.scss";
+@import "./components/shimmer.scss";
+@import "./components/signature-pad.scss";
+@import "./components/steper.scss";
+@import "./components/stripe-form.scss";
+@import "./components/support.scss";
+@import "./components/switch.scss";
+@import "./components/ui-loader.scss";
+@import "./components/video.scss";
+
+@import "./base/core/menu/menu-types/vertical-overlay-menu.scss";
+@import "./base/core/menu/menu-types/vertical-menu.scss";
+
+@import "./react/pages/page-authentication.scss";
+
+@import "./react/libs/charts/apex-charts.scss";
+@import "./react/libs/charts/recharts.scss";
+@import "./react/libs/context-menu/context-menu.scss";
+@import "./react/libs/drag-and-drop/drag-and-drop.scss";
+@import "./react/libs/react-select/_react-select.scss";
+@import "./react/libs/flatpickr/flatpickr.scss";
+
+@import "react-image-crop/dist/ReactCrop.css";
+@import "animate.css/animate.css";
+@import "swiper/swiper-bundle.css";

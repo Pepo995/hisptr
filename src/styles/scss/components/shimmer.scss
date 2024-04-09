@@ -1,0 +1,209 @@
+.shimmer-card {
+  box-shadow: none;
+}
+
+.shimmer-title {
+  .shimmer-title-line {
+    height: 80px;
+    border-radius: unset;
+    // margin-top: 30px;
+    margin-bottom: 30px;
+  }
+
+  .shimmer-title-line:last-child {
+    display: none;
+  }
+}
+$shimmerColor: #e1e2e4;
+$tableHeadbg: #f3f2f7;
+$guideBox: #f2f4f6;
+$black: #000000;
+$white: #ffffff;
+$mediaSizes: (
+  "mid": 640px,
+);
+
+.shimmer-thumbnail {
+  &.h24 {
+    height: 24px !important;
+  }
+}
+
+.same-table {
+  width: 100%;
+
+  .shimmer-table-row {
+    padding: 19px 0;
+    margin-bottom: 0px;
+    box-shadow: none;
+    border-radius: 0 !important;
+    border-top: 0 !important;
+    border: 1px solid rgba(196, 196, 196, 0.5);
+    min-height: 50px;
+
+    &:first-child {
+      border-color: $tableHeadbg;
+    }
+
+    & > .shimmer {
+      margin: 0 20px;
+
+      @media (max-width: map-get($mediaSizes, "mid")) {
+        margin: 0 10px;
+      }
+    }
+
+    &.shimmer-table-row--header {
+      background: $tableHeadbg;
+      min-height: 40px;
+      padding: 15px 0;
+
+      .shimmer-table-col {
+        background: rgba($black, 0.15) !important;
+      }
+    }
+  }
+}
+
+.custom-table {
+  width: 100%;
+
+  .shimmer-table-row {
+    padding: 18px 0;
+    margin-bottom: 0px;
+    box-shadow: none;
+    border-radius: 5px !important;
+    min-height: 48px;
+
+    & > .shimmer {
+      margin: 0 20px;
+
+      @media (max-width: map-get($mediaSizes, "mid")) {
+        margin: 0 10px;
+      }
+    }
+
+    &.shimmer-table-row--header {
+      background: $guideBox;
+      min-height: 57px;
+      padding: 22px 0;
+
+      .shimmer-table-col {
+        background: rgba($black, 0.15) !important;
+      }
+    }
+  }
+}
+
+.dynamicLink-table {
+  width: 100%;
+
+  .shimmer-table-row {
+    padding: 18px 0;
+    margin-bottom: 0px;
+    box-shadow: none;
+    border-radius: 5px !important;
+    min-height: 48px;
+
+    & > .shimmer {
+      margin: 0 20px;
+
+      @media (max-width: map-get($mediaSizes, "mid")) {
+        margin: 0 10px;
+      }
+    }
+
+    &.shimmer-table-row--header {
+      background: $white;
+      min-height: 48px;
+      padding: 18px 0;
+
+      .shimmer-table-col {
+        background: rgba($black, 0.1) !important;
+      }
+    }
+  }
+}
+
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.cu-shimmer {
+  background-color: #f2f4f6 !important;
+  background-image: linear-gradient(
+    to right,
+    #f6f6f6 8%,
+    #f0f0f0 18%,
+    #f6f6f6 33%
+  ) !important;
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  position: relative;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: placeholderShimmer;
+  animation-timing-function: linear;
+  &.h950 {
+    height: 950px !important;
+  }
+}
+
+.shimmer-thumbnail {
+  &.h400 {
+    height: 400px !important;
+  }
+  &.h200 {
+    height: 200px !important;
+  }
+
+  &.h150 {
+    height: 150px !important;
+  }
+
+  &.h120 {
+    height: 120px !important;
+  }
+
+  &.h150 {
+    height: 150px !important;
+  }
+
+  &.h100 {
+    height: 100px !important;
+  }
+
+  &.h80 {
+    height: 80px !important;
+  }
+
+  &.h40 {
+    height: 40px !important;
+  }
+
+  &.h20 {
+    height: 20px !important;
+  }
+
+  &.h100p {
+    height: 100px !important;
+  }
+
+  &.br20 {
+    border-radius: 20px;
+  }
+
+  &.mb20 {
+    margin-bottom: 20px;
+  }
+  &.mb50 {
+    margin-bottom: 50px;
+  }
+}

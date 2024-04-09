@@ -1,0 +1,42 @@
+.pdf-margin-top {
+  margin-top: 50px;
+
+  @include sm {
+    margin-top: auto;
+  }
+
+  .pdf-card {
+    // width: 100%;
+    // min-width: 370px;
+    box-shadow: 0 4px 24px 0 rgb(34 41 47 / 10%);
+    border-color: transparent !important;
+
+    @include md {
+      margin-top: 15px;
+    }
+
+    @include sm {
+      margin-top: 15px;
+    }
+
+    .pdf-content {
+      background-color: $primary-light;
+      width: 100%;
+      // max-width: 377px;
+      height: 100%;
+      min-height: 199px;
+    }
+  }
+}
+
+.infinite-Scrolling {
+  height: 100% !important;
+  width: auto;
+  overflow: hidden !important;
+}
+
+.hover-text {
+  &:hover {
+    color: $primary !important;
+  }
+}

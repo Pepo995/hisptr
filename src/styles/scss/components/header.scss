@@ -1,0 +1,144 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap");
+$sy-white: #ffffff;
+$primary: #fd6f6e;
+
+.home-header {
+  font-family: "Ubuntu Mono", monospace !important;
+  text-transform: uppercase;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 7;
+}
+
+.nav-link.customer-nav-link {
+  // color: white !important;
+  color: $sy-white !important;
+  svg {
+    color: $primary !important;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+}
+.active.customer-active {
+  border-bottom: 2px solid $sy-white;
+  .nav-link.customer-nav-link {
+    color: $primary !important;
+  }
+}
+.hipstr-responsive-header {
+  @include lg {
+    width: 100% !important;
+    text-align: center;
+  }
+}
+.nav-item.customer-nav-item {
+  margin: 0 20px;
+  &:last-child {
+    margin: 0 0 0 20px;
+  }
+}
+.cu-navbar {
+  padding: 20px 0 !important;
+  @include md {
+    padding: 6px 0 !important;
+  }
+}
+.width-header {
+  width: 93% !important;
+  margin: 0 auto;
+  // @include md{
+  //     transition-timing-function: ease-in-out !important;
+  //     transition: width 2s !important;
+  // }
+}
+.navbar-toggler {
+  color: $sy-white !important;
+}
+// responsive
+@media only screen and (max-width: 992px) {
+  .nav-item.customer-nav-item {
+    margin: 10px 0px !important;
+    width: fit-content;
+  }
+
+  .home-header {
+    background: linear-gradient(180deg, #000000 2.17%, rgba(0, 0, 0, 0.9) 100%);
+    padding: 6px 0;
+  }
+  .navbar-toggler:focus {
+    box-shadow: initial !important;
+  }
+  .meet-detail-txt {
+    margin-top: 15px;
+  }
+  .testi-txt-sp {
+    padding-top: 5px !important;
+    padding-right: 42px !important;
+  }
+}
+.progile-img {
+  width: 47px;
+  height: 47px !important;
+  @include lg {
+    width: 40px;
+    height: 40px !important;
+  }
+  @include sm {
+    margin-top: 2px;
+    width: 30px;
+    height: 30px !important;
+  }
+}
+
+.dropdown-card {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 24px 0 rgb(34 41 47 / 10%) !important;
+
+  @include md {
+    // position: static !important;
+    // transform: translate3d(0px, 6px, 0px) !important;
+  }
+  .dropdown-content {
+    @include sm {
+      font-size: 12px;
+    }
+  }
+}
+.sticky-top {
+  @include sm {
+    padding: 0 !important;
+  }
+  .main-logo {
+    @include sm {
+      width: 50%;
+    }
+  }
+}
+.log-out {
+  color: $primary;
+}
+a.nav-link.customer-nav-link.f-14.f-500.active {
+  color: white !important;
+}
+
+.testi-txt-sp {
+  @include sm {
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+.dropdown-for-des {
+  @include lg {
+    display: none;
+  }
+}
+.dropdown-for-mob {
+  display: none;
+  @include lg {
+    display: block;
+  }
+}

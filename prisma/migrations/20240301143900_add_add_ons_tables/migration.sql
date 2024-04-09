@@ -1,0 +1,23 @@
+-- CreateTable
+CREATE TABLE `AddOn` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) NOT NULL,
+    `description` VARCHAR(255) NOT NULL,
+    `priceInCents` INTEGER NOT NULL,
+    `created_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updated_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `EventAddOn` (
+    `eventId` BIGINT UNSIGNED NOT NULL,
+    `addOnId` INTEGER UNSIGNED NOT NULL,
+    `quantity` INTEGER UNSIGNED NOT NULL,
+    `unitPriceInCents` INTEGER NOT NULL,
+    `description` VARCHAR(255) NOT NULL,
+    `created_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    PRIMARY KEY (`eventId`, `addOnId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

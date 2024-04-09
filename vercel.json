@@ -1,0 +1,17 @@
+{
+  "crons": [
+    {
+      "path": "/api/crons/stripe-payments-cron",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/crons/new-lead-announcer-cron",
+      "schedule": "0/2 * * * *"
+    }
+  ],
+  "functions": {
+    "src/pages/api/crons/*.ts": {
+      "maxDuration": 30
+    }
+  }
+}

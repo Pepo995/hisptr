@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `stripe_payments` MODIFY `date` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0);

@@ -1,0 +1,35 @@
+import type AvailabilityReducer from "@redux/reducers/AvailabilityReducer";
+import type CustomerReducer from "@redux/reducers/CustomerReducer";
+import type EventReducer from "@redux/reducers/EventReducer";
+import type MemberListingReducer from "@redux/reducers/MemberListingReducer";
+import type MessageReducer from "@redux/reducers/MessageReducer";
+import type ModuleReducer from "@redux/reducers/ModuleReducer";
+import type NotificationReducer from "@redux/reducers/NotificationReducer";
+import type PartnerReducer from "@redux/reducers/PartnerReducer";
+import type RoleReducer from "@redux/reducers/RoleReducer";
+import type SidebarReducer from "@redux/reducers/SidebarReducer";
+import type SupportReducer from "@redux/reducers/SupportReducer";
+import type VenueReducer from "@redux/reducers/VenueReducer";
+import type CountryReducer from "@redux/reducers/CountryReducer";
+import type navbar from "@redux/navbar";
+import type layout from "@redux/layout";
+import type PackageReducer from "@redux/reducers/PackageReducer";
+
+export type AppState = {
+  layout: ReturnType<typeof layout>;
+  navbar: ReturnType<typeof navbar>;
+  availabilityReducer: ReturnType<typeof AvailabilityReducer>;
+  countryReducer: ReturnType<typeof CountryReducer>;
+  customerReducer: ReturnType<typeof CustomerReducer>;
+  eventReducer?: ReturnType<typeof EventReducer>;
+  memberListingReducer: ReturnType<typeof MemberListingReducer>;
+  messageReducer: ReturnType<typeof MessageReducer>;
+  moduleReducer: ReturnType<typeof ModuleReducer>;
+  notificationReducer: ReturnType<typeof NotificationReducer>;
+  partnerReducer: ReturnType<typeof PartnerReducer>;
+  packageReducer: ReturnType<typeof PackageReducer>;
+  roleReducer: ReturnType<typeof RoleReducer>;
+  sidebar: ReturnType<typeof SidebarReducer>;
+  supportReducer: ReturnType<typeof SupportReducer>;
+  venueReducer: ReturnType<typeof VenueReducer>;
+};

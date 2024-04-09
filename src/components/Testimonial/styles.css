@@ -1,0 +1,11 @@
+.glider-dot {
+  background: rgba(0, 0, 0, 0);
+  border: 1px solid white;
+  box-shadow: none;
+  width: 16px;
+  height: 16px;
+}
+
+.glider-dot.active {
+  background: white;
+}

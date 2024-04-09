@@ -1,0 +1,5 @@
+-- AddForeignKey
+ALTER TABLE `EventAddOn` ADD CONSTRAINT `EventAddOn_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `events`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `EventAddOn` ADD CONSTRAINT `EventAddOn_addOnId_fkey` FOREIGN KEY (`addOnId`) REFERENCES `AddOn`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

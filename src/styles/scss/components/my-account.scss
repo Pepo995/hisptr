@@ -1,0 +1,45 @@
+.myaccount-header {
+  background-color: black;
+
+  .navbar {
+    background-color: black;
+  }
+}
+
+.myaccount-card {
+  //   margin-top: 175px;
+  box-shadow: 0 4px 24px 0 rgb(34 41 47 / 10%);
+  border-color: transparent !important;
+
+  @include sm {
+    margin-top: 90px;
+  }
+
+  .myaccount-img-select {
+    position: relative;
+
+    .edit-button {
+      position: absolute;
+      bottom: -14px;
+      right: -11px;
+
+      .edit-btn {
+        width: 33px;
+        height: auto;
+        background-color: $sy-black !important;
+        border-color: $sy-black !important;
+      }
+    }
+  }
+
+  .border-bottom {
+    border-bottom: 1px solid $primary !important;
+    caret-color: $primary;
+  }
+}
+
+.dropdown-item {
+  &:active {
+    background-color: transparent !important;
+  }
+}

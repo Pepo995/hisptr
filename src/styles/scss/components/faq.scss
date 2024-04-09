@@ -1,0 +1,19 @@
+.margin-top {
+  margin-top: 50px;
+
+  @include sm {
+    margin-top: auto;
+  }
+}
+
+.edit-btn {
+  margin-left: auto !important;
+}
+
+.accordion-button::after {
+  margin-left: 9px;
+}
+
+.accordion-header-customer > button::after {
+  margin-left: auto !important;
+}

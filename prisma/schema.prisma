@@ -1,0 +1,1067 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+model StripeCustomer {
+  email              String              @id
+  stripeCustomerId   String              @unique
+  stripeSetupIntents StripeSetupIntent[]
+  stripePayment      StripePayment[]
+
+  @@map("stripe_customers")
+}
+
+model StripeSetupIntent {
+  stripeCustomerEmail String
+  setupIntentId       String         @unique
+  stripeCustomer      StripeCustomer @relation(fields: [stripeCustomerEmail], references: [email])
+
+  @@id([stripeCustomerEmail, setupIntentId])
+  @@map("stripe_setup_intents")
+}
+
+model StripePayment {
+  stripeCustomerEmail String
+  paymentId           String            @unique
+  paymentStatus       StripePaymentEnum
+  stripeCustomer      StripeCustomer    @relation(fields: [stripeCustomerEmail], references: [email])
+  eventId             BigInt            @map("event_id") @db.UnsignedBigInt
+  event               Event             @relation(fields: [eventId], references: [id])
+  amountInCents       Int               @default(0) @db.UnsignedInt
+  date                DateTime          @default(now()) @db.Timestamp(0)
+
+  invoice Invoice?
+
+  @@id([stripeCustomerEmail, paymentId])
+  @@map("stripe_payments")
+}
+
+model StripeWebhookEventsLog {
+  eventId   String   @id
+  content   String   @db.LongText
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  @@map("stripe_webhook_events_logs")
+}
+
+model AvailabilityRequestPartner {
+  id                    BigInt                                     @id @default(autoincrement()) @db.UnsignedBigInt
+  availabilityRequestId BigInt                                     @map("availability_request_id") @db.UnsignedBigInt
+  partnerId             BigInt                                     @map("partner_id") @db.UnsignedBigInt
+  status                availability_request_partners_status?      @default(pending)
+  isAssigned            Boolean?                                   @default(false) @map("is_assigned")
+  reasonType            availability_request_partners_reason_type? @map("reason_type")
+  reason                String?                                    @db.VarChar(255)
+  createdBy             String?                                    @map("created_by") @db.VarChar(255)
+  updatedBy             String?                                    @map("updated_by") @db.VarChar(255)
+  createdAt             DateTime?                                  @map("created_at") @db.Timestamp(0)
+  updatedAt             DateTime?                                  @map("updated_at") @db.Timestamp(0)
+  availabilityRequests  AvailabilityRequest                        @relation(fields: [availabilityRequestId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_request_partners_availability_request_id_foreign")
+  users                 User                                       @relation(fields: [partnerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_request_partners_partner_id_foreign")
+
+  @@index([availabilityRequestId], map: "availability_request_partners_availability_request_id_foreign")
+  @@index([partnerId], map: "availability_request_partners_partner_id_foreign")
+  @@map("availability_request_partners")
+}
+
+model AvailabilityRequest {
+  id                                                              BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  availabilityNumber                                              String?                      @map("availability_number") @db.VarChar(255)
+  marketId                                                        Int                          @map("market_id") @db.UnsignedInt
+  eventType                                                       Int                          @map("event_type") @db.UnsignedInt
+  eventDate                                                       DateTime                     @map("event_date") @db.Date
+  startTime                                                       DateTime                     @map("start_time") @db.Time(0)
+  endTime                                                         DateTime                     @map("end_time") @db.Time(0)
+  stateId                                                         Int                          @map("state_id") @db.UnsignedInt
+  city                                                            String                       @db.VarChar(255)
+  packageId                                                       Int                          @map("package_id") @db.UnsignedInt
+  createdBy                                                       String?                      @map("created_by") @db.VarChar(255)
+  updatedBy                                                       String?                      @map("updated_by") @db.VarChar(255)
+  createdAt                                                       DateTime?                    @map("created_at") @db.Timestamp(0)
+  updatedAt                                                       DateTime?                    @map("updated_at") @db.Timestamp(0)
+  availabilityRequestPartners                                     AvailabilityRequestPartner[]
+  eventPreferencesAvailabilityRequestsEventTypeToeventPreferences EventPreference              @relation("availability_requests_event_typeToevent_preferences", fields: [eventType], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_requests_event_type_foreign")
+  eventPreferencesAvailabilityRequestsMarketIdToeventPreferences  EventPreference              @relation("availability_requests_market_idToevent_preferences", fields: [marketId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_requests_market_id_foreign")
+  packages                                                        Package                      @relation(fields: [packageId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_requests_package_id_foreign")
+  states                                                          State                        @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "availability_requests_state_id_foreign")
+  events                                                          Event[]
+
+  @@index([eventType], map: "availability_requests_event_type_foreign")
+  @@index([marketId], map: "availability_requests_market_id_foreign")
+  @@index([packageId], map: "availability_requests_package_id_foreign")
+  @@index([stateId], map: "availability_requests_state_id_foreign")
+  @@map("availability_requests")
+}
+
+model Blog {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  title      String    @db.VarChar(255)
+  authorName String    @map("auther_name") @db.VarChar(255)
+  content    String    @db.LongText
+  mainImage  String    @map("main_image") @db.VarChar(255)
+  createdBy  String?   @map("created_by") @db.VarChar(255)
+  updatedBy  String?   @map("updated_by") @db.VarChar(255)
+  createdAt  DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime? @map("updated_at") @db.Timestamp(0)
+
+  @@map("blogs")
+}
+
+model ChatRoomMessage {
+  id                                     BigInt                           @id @default(autoincrement()) @db.UnsignedBigInt
+  chatRoomId                             BigInt                           @map("chat_room_id") @db.UnsignedBigInt
+  senderId                               BigInt                           @map("sender_id") @db.UnsignedBigInt
+  receiverId                             BigInt                           @map("receiver_id") @db.UnsignedBigInt
+  senderType                             chat_room_messages_sender_type   @map("sender_type")
+  receiverType                           chat_room_messages_receiver_type @map("receiver_type")
+  message                                String                           @db.Text
+  isSeen                                 Boolean                          @default(false) @map("is_seen")
+  createdBy                              String?                          @map("created_by") @db.VarChar(255)
+  updatedBy                              String?                          @map("updated_by") @db.VarChar(255)
+  createdAt                              DateTime?                        @map("created_at") @db.Timestamp(0)
+  updatedAt                              DateTime?                        @map("updated_at") @db.Timestamp(0)
+  chatRooms                              ChatRooms                        @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "chat_room_messages_chat_room_id_foreign")
+  usersChatRoomMessagesReceiverIdTousers User                             @relation("chat_room_messages_receiver_idTousers", fields: [receiverId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "chat_room_messages_receiver_id_foreign")
+  usersChatRoomMessagesSenderIdTousers   User                             @relation("chat_room_messages_sender_idTousers", fields: [senderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "chat_room_messages_sender_id_foreign")
+
+  @@index([chatRoomId], map: "chat_room_messages_chat_room_id_foreign")
+  @@index([receiverId], map: "chat_room_messages_receiver_id_foreign")
+  @@index([senderId], map: "chat_room_messages_sender_id_foreign")
+  @@map("chat_room_messages")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ChatRooms {
+  id               BigInt            @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId          BigInt            @map("event_id") @db.UnsignedBigInt
+  type             chat_rooms_type
+  createdBy        String?           @map("created_by") @db.VarChar(255)
+  updatedBy        String?           @map("updated_by") @db.VarChar(255)
+  createdAt        DateTime?         @map("created_at") @db.Timestamp(0)
+  updatedAt        DateTime?         @map("updated_at") @db.Timestamp(0)
+  chatRoomMessages ChatRoomMessage[]
+  events           Event             @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "chat_rooms_event_id_foreign")
+
+  @@index([eventId], map: "chat_rooms_event_id_foreign")
+  @@map("chat_rooms")
+}
+
+model Country {
+  id              BigInt           @id @default(autoincrement()) @db.UnsignedBigInt
+  sortname        String           @db.VarChar(255)
+  name            String           @db.VarChar(255)
+  phonecode       String           @db.VarChar(255)
+  isActive        Boolean          @default(true) @map("is_active")
+  createdAt       DateTime?        @map("created_at") @db.Timestamp(0)
+  updatedAt       DateTime?        @map("updated_at") @db.Timestamp(0)
+  countryPartners CountryPartner[]
+  userDetails     UserDetail[]
+
+  @@map("countries")
+}
+
+model CountryPartner {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt    @map("user_id") @db.UnsignedBigInt
+  countryId BigInt    @map("country_id") @db.UnsignedBigInt
+  createdAt DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime? @map("updated_at") @db.Timestamp(0)
+  countries Country   @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "country_partners_country_id_foreign")
+  users     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "country_partners_user_id_foreign")
+
+  @@index([countryId], map: "country_partners_country_id_foreign")
+  @@index([userId], map: "country_partners_user_id_foreign")
+  @@map("country_partners")
+}
+
+model CustomerNotification {
+  id          BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  title       String                       @db.VarChar(255)
+  description String                       @db.Text
+  eventId     BigInt?                      @map("event_id") @db.UnsignedBigInt
+  userId      BigInt                       @map("user_id") @db.UnsignedBigInt
+  isRead      Boolean                      @default(false) @map("is_read")
+  type        customer_notifications_type?
+  createdAt   DateTime?                    @map("created_at") @db.Timestamp(0)
+  updatedAt   DateTime?                    @map("updated_at") @db.Timestamp(0)
+  events      Event?                       @relation(fields: [eventId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "customer_notifications_event_id_foreign")
+  users       User                         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "customer_notifications_user_id_foreign")
+
+  @@index([eventId], map: "customer_notifications_event_id_foreign")
+  @@index([userId], map: "customer_notifications_user_id_foreign")
+  @@map("customer_notifications")
+}
+
+model Error {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt?   @map("user_id") @db.UnsignedBigInt
+  code      String?   @db.VarChar(255)
+  file      String?   @db.VarChar(255)
+  line      String?   @db.VarChar(255)
+  message   String?   @db.Text
+  trace     String?   @db.Text
+  createdAt DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime? @map("updated_at") @db.Timestamp(0)
+
+  @@map("errors")
+}
+
+model EventPhotosDetail {
+  id                                                                  BigInt          @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId                                                             BigInt          @map("event_id") @db.UnsignedBigInt
+  filterType                                                          Int             @map("filter_type") @db.UnsignedInt
+  orientationType                                                     Int             @map("orientation_type") @db.UnsignedInt
+  designType                                                          Int             @map("design_type") @db.UnsignedInt
+  firstLine                                                           String?         @map("first_line") @db.VarChar(255)
+  secondLine                                                          String?         @map("second_line") @db.VarChar(255)
+  primaryColor                                                        String?         @map("primary_color") @db.VarChar(255)
+  secondaryColor                                                      String?         @map("secondary_color") @db.VarChar(255)
+  vision                                                              String?         @db.LongText
+  logo                                                                String?         @db.VarChar(255)
+  backdropType                                                        Int             @map("backdrop_type") @db.UnsignedInt
+  createdBy                                                           String?         @map("created_by") @db.VarChar(255)
+  updatedBy                                                           String?         @map("updated_by") @db.VarChar(255)
+  createdAt                                                           DateTime?       @map("created_at") @db.Timestamp(0)
+  updatedAt                                                           DateTime?       @map("updated_at") @db.Timestamp(0)
+  eventPreferencesEventPhotosDetailsBackdropTypeToeventPreferences    EventPreference @relation("event_photos_details_backdrop_typeToevent_preferences", fields: [backdropType], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_photos_details_backdrop_type_foreign")
+  eventPreferencesEventPhotosDetailsDesignTypeToeventPreferences      EventPreference @relation("event_photos_details_design_typeToevent_preferences", fields: [designType], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_photos_details_design_type_foreign")
+  events                                                              Event           @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_photos_details_event_id_foreign")
+  eventPreferencesEventPhotosDetailsFilterTypeToeventPreferences      EventPreference @relation("event_photos_details_filter_typeToevent_preferences", fields: [filterType], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_photos_details_filter_type_foreign")
+  eventPreferencesEventPhotosDetailsOrientationTypeToeventPreferences EventPreference @relation("event_photos_details_orientation_typeToevent_preferences", fields: [orientationType], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_photos_details_orientation_type_foreign")
+
+  @@index([backdropType], map: "event_photos_details_backdrop_type_foreign")
+  @@index([designType], map: "event_photos_details_design_type_foreign")
+  @@index([eventId], map: "event_photos_details_event_id_foreign")
+  @@index([filterType], map: "event_photos_details_filter_type_foreign")
+  @@index([orientationType], map: "event_photos_details_orientation_type_foreign")
+  @@map("event_photos_details")
+}
+
+model EventPreference {
+  id                                                                    Int                    @id @default(autoincrement()) @db.UnsignedInt
+  name                                                                  String                 @db.VarChar(255)
+  code                                                                  String                 @db.VarChar(255)
+  type                                                                  event_preferences_type
+  createdAt                                                             DateTime?              @map("created_at") @db.Timestamp(0)
+  updatedAt                                                             DateTime?              @map("updated_at") @db.Timestamp(0)
+  availabilityRequestsAvailabilityRequestsEventTypeToeventPreferences   AvailabilityRequest[]  @relation("availability_requests_event_typeToevent_preferences")
+  availabilityRequestsAvailabilityRequestsMarketIdToeventPreferences    AvailabilityRequest[]  @relation("availability_requests_market_idToevent_preferences")
+  eventPhotosDetailsEventPhotosDetailsBackdropTypeToeventPreferences    EventPhotosDetail[]    @relation("event_photos_details_backdrop_typeToevent_preferences")
+  eventPhotosDetailsEventPhotosDetailsDesignTypeToeventPreferences      EventPhotosDetail[]    @relation("event_photos_details_design_typeToevent_preferences")
+  eventPhotosDetailsEventPhotosDetailsFilterTypeToeventPreferences      EventPhotosDetail[]    @relation("event_photos_details_filter_typeToevent_preferences")
+  eventPhotosDetailsEventPhotosDetailsOrientationTypeToeventPreferences EventPhotosDetail[]    @relation("event_photos_details_orientation_typeToevent_preferences")
+  events_events_category_idToevent_preferences                          Event[]                @relation("events_category_idToevent_preferences")
+  events_events_marketToevent_preferences                               Event[]                @relation("events_marketToevent_preferences")
+  events_events_reach_viaToevent_preferences                            Event[]                @relation("events_reach_viaToevent_preferences")
+  events_events_type_idToevent_preferences                              Event[]                @relation("events_type_idToevent_preferences")
+
+  inProcessEvents InProcessEvent[]
+
+  @@map("event_preferences")
+  @@unique([code, type])
+}
+
+model EventSetupDetail {
+  id                  BigInt                                    @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId             BigInt                                    @map("event_id") @db.UnsignedBigInt
+  contactName         String?                                   @map("contact_name") @db.VarChar(255)
+  phoneNumber         String?                                   @map("phone_number") @db.VarChar(255)
+  email               String?                                   @db.VarChar(255)
+  location            String?                                   @db.LongText
+  isParkingAvailable  event_setup_details_is_parking_available  @map("is_parking_available")
+  setupLocation       event_setup_details_setup_location        @map("setup_location")
+  availableForSetup   event_setup_details_available_for_setup   @map("available_for_setup")
+  setupDetails        String?                                   @map("setup_details") @db.LongText
+  isElevatorAvailable event_setup_details_is_elevator_available @map("is_elevator_available")
+  createdBy           String?                                   @map("created_by") @db.VarChar(255)
+  updatedBy           String?                                   @map("updated_by") @db.VarChar(255)
+  createdAt           DateTime?                                 @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime?                                 @map("updated_at") @db.Timestamp(0)
+  events              Event                                     @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_setup_details_event_id_foreign")
+  allocationSpaceVerified Boolean?                              @map("allocation_space_verified")
+
+  @@index([eventId], map: "event_setup_details_event_id_foreign")
+  @@map("event_setup_details")
+}
+
+model EventVenueDetail {
+  id                  BigInt                                     @id @default(autoincrement()) @db.UnsignedBigInt
+  eventId             BigInt                                     @map("event_id") @db.UnsignedBigInt
+  firstName           String?                                    @map("first_name") @db.VarChar(255)
+  lastName            String?                                    @map("last_name") @db.VarChar(255)
+  email               String?                                    @db.VarChar(255)
+  name                String?                                    @db.VarChar(255)
+  addressLine1        String?                                    @map("address_line_1") @db.VarChar(255)
+  addressLine2        String?                                    @map("address_line_2") @db.VarChar(255)
+  city                String?                                    @db.VarChar(255)
+  stateId             Int?                                       @map("state_id") @db.UnsignedInt
+  zipcode             String?                                    @db.VarChar(255)
+  isElevatorAvailable event_venue_details_is_elevator_available? @map("is_elevator_available")
+  COI                 event_venue_details_COI
+  document            String?                                    @db.LongText
+  createdBy           String?                                    @map("created_by") @db.VarChar(255)
+  updatedBy           String?                                    @map("updated_by") @db.VarChar(255)
+  createdAt           DateTime?                                  @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime?                                  @map("updated_at") @db.Timestamp(0)
+  events              Event                                      @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_venue_details_event_id_foreign")
+  states              State?                                     @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "event_venue_details_state_id_foreign")
+
+  @@index([eventId], map: "event_venue_details_event_id_foreign")
+  @@index([stateId], map: "event_venue_details_state_id_foreign")
+  @@map("event_venue_details")
+}
+
+model Event {
+  id                             BigInt                          @id @default(autoincrement()) @db.UnsignedBigInt
+  eventDate                      DateTime                        @map("event_date") @db.Date
+  createdBy                      String?                         @map("created_by") @db.VarChar(255)
+  updatedBy                      String?                         @map("updated_by") @db.VarChar(255)
+  createdAt                      DateTime?                       @map("created_at") @db.Timestamp(0)
+  updatedAt                      DateTime?                       @map("updated_at") @db.Timestamp(0)
+  eventNumber                    String                          @map("event_number") @db.VarChar(255)
+  availabilityId                 BigInt?                         @map("availability_id") @db.UnsignedBigInt
+  firstName                      String                          @map("first_name") @db.VarChar(255)
+  lastName                       String                          @map("last_name") @db.VarChar(255)
+  phoneNumber                    String                          @map("phone_number") @db.VarChar(255)
+  email                          String                          @db.VarChar(255)
+  city                           String                          @db.VarChar(255)
+  stateId                        Int?                            @map("state_id") @db.UnsignedInt
+  userId                         BigInt?                         @map("user_id") @db.UnsignedBigInt
+  market                         Int?                            @db.UnsignedInt
+  packageId                      Int                             @map("package_id") @db.UnsignedInt
+  isEventPlanner                 events_is_event_planner         @default(yes) @map("is_event_planner")
+  isHolderOnReservation          events_is_holder_on_reservation @default(yes) @map("is_holder_on_reservation")
+  plannerFirstName               String?                         @map("planner_first_name") @db.VarChar(255)
+  plannerLastName                String?                         @map("planner_last_name") @db.VarChar(255)
+  plannerEmail                   String?                         @map("planner_email") @db.VarChar(255)
+  plannerPhoneNumber             String?                         @map("planner_phone_number") @db.VarChar(255)
+  plannerCompanyName             String?                         @map("planner_company_name") @db.VarChar(255)
+  typeId                         Int?                            @map("type_id") @db.UnsignedInt
+  categoryId                     Int?                            @map("category_id") @db.UnsignedInt
+  reachVia                       Int?                            @map("reach_via") @db.UnsignedInt
+  guestCount                     Int?                            @map("guest_count")
+  startTime                      DateTime?                       @map("start_time") @db.Time(0)
+  endTime                        DateTime?                       @map("end_time") @db.Time(0)
+  partnerId                      BigInt?                         @map("partner_id") @db.UnsignedBigInt
+  hostId                         BigInt?                         @map("host_id") @db.UnsignedBigInt
+  agreement                      String?                         @db.VarChar(255)
+  adminStatus                    events_admin_status?            @map("admin_status")
+  customerStatus                 events_customer_status?         @map("customer_status")
+  isAgree                        Boolean                         @default(false) @map("is_agree")
+  chatRooms                      ChatRooms[]
+  customerNotifications          CustomerNotification[]
+  eventPhotosDetails             EventPhotosDetail[]
+  eventSetupDetails              EventSetupDetail[]
+  eventVenueDetails              EventVenueDetail[]
+  paymentPlan                    event_payment_plan              @default(full) @map("payment_plan")
+  amountPaidInCents              Int                             @default(0) @map("amount_paid_in_cents") @db.UnsignedInt
+  totalPriceInCents              Int                             @default(0) @map("total_price_in_cents") @db.UnsignedInt
+  retailPriceInCents             Int                             @default(0) @db.UnsignedInt
+  discountInCents                Int                             @default(0) @map("discount_in_cents") @db.UnsignedInt
+  stripeFeeInCents               Int                             @default(0) @map("stripe_fee_in_cents") @db.UnsignedInt
+  travelFeeInCents               Int                             @default(0) @map("travel_fee_in_cents") @db.UnsignedInt
+  promotionalCodeCode            String?                         @db.VarChar(255)
+  promotionalCodeDiscountInCents Int?                            @default(0) @db.UnsignedInt
+  firstPaymentDate               DateTime?                       @db.Timestamp(0)
+  inProcessEventId               String?                         @unique
+  signUpToken                    String?                         @unique @db.VarChar(255)
+  acceptedAt                     DateTime?
+
+  availabilityRequests                               AvailabilityRequest? @relation(fields: [availabilityId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "events_availability_id_foreign")
+  eventPreferencesEventsCategoryIdToeventPreferences EventPreference?     @relation("events_category_idToevent_preferences", fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_category_id_foreign")
+  eventPreferencesEventsMarketToeventPreferences     EventPreference?     @relation("events_marketToevent_preferences", fields: [market], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_market_foreign")
+  packages                                           Package              @relation(fields: [packageId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_package_id_foreign")
+  usersEventsHostIdTousers                           User?                @relation("events_host_idTousers", fields: [hostId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_partner_employee_id_foreign")
+  usersEventsPartnerIdTousers                        User?                @relation("events_partner_idTousers", fields: [partnerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_partner_id_foreign")
+  eventPreferencesEventsReachViaToeventPreferences   EventPreference?     @relation("events_reach_viaToevent_preferences", fields: [reachVia], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_reach_via_foreign")
+  states                                             State?               @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_state_id_foreign")
+  eventPreferencesEventsTypeIdToeventPreferences     EventPreference?     @relation("events_type_idToevent_preferences", fields: [typeId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_type_id_foreign")
+  usersEventsUserIdTousers                           User?                @relation("events_user_idTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "events_user_id_foreign")
+  tickets                                            Ticket[]
+  payments                                           StripePayment[]
+  promotionalCode                                    PromotionalCode?     @relation(fields: [promotionalCodeCode], references: [code], onDelete: Cascade, onUpdate: NoAction, map: "events_promotional_code_code_foreign")
+  inProcessEvent                                     InProcessEvent?      @relation(fields: [inProcessEventId], references: [id])
+  invoices                                           Invoice[]
+  addOns                                             EventAddOn[]
+  extraPackages                                      EventPackages[]
+
+  @@index([availabilityId], map: "events_availability_id_foreign")
+  @@index([categoryId], map: "events_category_id_foreign")
+  @@index([market], map: "events_market_foreign")
+  @@index([packageId], map: "events_package_id_foreign")
+  @@index([hostId], map: "events_partner_employee_id_foreign")
+  @@index([partnerId], map: "events_partner_id_foreign")
+  @@index([reachVia], map: "events_reach_via_foreign")
+  @@index([stateId], map: "events_state_id_foreign")
+  @@index([typeId], map: "events_type_id_foreign")
+  @@index([userId], map: "events_user_id_foreign")
+  @@index([promotionalCodeCode], map: "events_promotional_code_code_foreign")
+  @@map("events")
+}
+
+model InProcessEvent {
+  id                            String             @id @default(uuid()) @db.VarChar(36)
+  firstName                     String             @db.VarChar(255)
+  lastName                      String             @db.VarChar(255)
+  eventDate                     DateTime?
+  typeId                        Int?               @db.UnsignedInt
+  city                          String?            @db.VarChar(255)
+  stateId                       Int?               @db.UnsignedInt
+  email                         String?            @db.VarChar(255)
+  phoneNumber                   String?            @db.VarChar(255)
+  budgetForPrice                Int?               @default(0) @db.UnsignedInt
+  approximateBudget             Int?               @default(0) @db.UnsignedInt
+  message                       String?            @db.VarChar(255)
+  receiveCommunicationsAccepted Boolean?           @default(false)
+  packageId                     Int?               @db.UnsignedInt
+  packageQty                    Int                @default(1) @db.UnsignedInt
+  packageDescription            String?            @db.Text
+  packageRetailPriceInCents     Int                @default(0) @db.UnsignedInt
+  paymentPlan                   event_payment_plan @default(full) @map("payment_plan")
+  totalPriceForFullInCents      Int                @default(0) @map("total_price_for_full_in_cents") @db.UnsignedInt
+  totalPriceForPartialInCents   Int                @default(0) @map("total_price_for_partial_in_cents") @db.UnsignedInt
+  discountInCents               Int                @default(0) @map("discount_in_cents") @db.UnsignedInt
+  stripeFeeForFullInCents       Int                @default(0) @map("stripe_fee_for_full_in_cents") @db.UnsignedInt
+  stripeFeeForPartialInCents    Int                @default(0) @map("stripe_fee_for_partial_in_cents") @db.UnsignedInt
+  travelFeeInCents              Int                @default(0) @map("travel_fee_in_cents") @db.UnsignedInt
+  retailPriceInCents            Int                @default(0) @db.UnsignedInt
+  isCorporateEvent              Boolean?           @default(false)
+  createdAt                     DateTime           @default(now()) @map("created_at")
+  updatedAt                     DateTime           @default(now()) @updatedAt @map("updated_at")
+  hasBeenAnnounced              Boolean?           @default(false)
+  isActive                      Boolean?           @default(true)
+  utmParamsId                   Int?               @unique @db.UnsignedInt
+  marketName                    String?            @db.VarChar(255)
+  bookingType                   BookingType        @default(bookingFlow) @map("booking_type")
+
+  packages  Package?         @relation(fields: [packageId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "in_process_events_package_id_foreign")
+  states    State?           @relation(fields: [stateId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "in_process_events_state_id_foreign")
+  type      EventPreference? @relation(fields: [typeId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "in_process_events_type_id_foreign")
+  utmParams UtmParams?       @relation(fields: [utmParamsId], references: [id])
+  event     Event?
+  invoices  Invoice[]
+
+  @@index([packageId], map: "in_process_events_package_id_foreign")
+  @@index([stateId], map: "in_process_events_state_id_foreign")
+  @@index([typeId], map: "in_process_events_type_id_foreign")
+  @@map("in_process_events")
+}
+
+model AddOn {
+  id           Int      @id @default(autoincrement()) @db.UnsignedInt
+  name         String   @db.VarChar(255)
+  description  String   @db.Text
+  priceInCents Int
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamp(0)
+
+  eventAddOns EventAddOn[]
+}
+
+model EventAddOn {
+  eventId          BigInt   @db.UnsignedBigInt
+  addOnId          Int      @db.UnsignedInt
+  quantity         Int      @db.UnsignedInt
+  unitPriceInCents Int
+  description      String   @db.Text
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+
+  event Event? @relation(fields: [eventId], references: [id])
+  addOn AddOn  @relation(fields: [addOnId], references: [id])
+
+  @@id([eventId, addOnId])
+}
+
+model EventPackages {
+  eventId                   BigInt @db.UnsignedBigInt
+  packageId                 Int    @db.UnsignedInt
+  packageDescription        String @db.Text
+  packageRetailPriceInCents Int    @db.UnsignedInt
+  packageQty                Int    @db.UnsignedInt
+
+  event Event? @relation(fields: [eventId], references: [id])
+
+  @@id([eventId, packageId])
+}
+
+model Invoice {
+  id                Int          @id @default(autoincrement()) @db.UnsignedInt
+  invoiceDate       DateTime     @default(now()) @db.Timestamp(0)
+  invoiceType       invoice_type
+  inProcessEventId  String?
+  eventId           BigInt       @db.UnsignedBigInt
+  paymentId         String?      @unique
+  subtotalInCents   Int          @db.UnsignedInt
+  paidBeforeInCents Int?         @db.UnsignedInt
+  pendingInCents    Int?         @db.UnsignedInt
+  pendingDueDate    DateTime?    @db.Timestamp(0)
+
+  event          Event           @relation(fields: [eventId], references: [id])
+  inProcessEvent InProcessEvent? @relation(fields: [inProcessEventId], references: [id])
+  payment        StripePayment?  @relation(fields: [paymentId], references: [paymentId])
+}
+
+model UtmParams {
+  id          Int     @id @default(autoincrement()) @db.UnsignedInt
+  utmSource   String? @db.VarChar(255)
+  utmMedium   String? @db.VarChar(255)
+  utmCampaign String? @db.VarChar(255)
+  utmTerm     String? @db.VarChar(255)
+  utmContent  String? @db.VarChar(255)
+  utmId       String? @db.VarChar(255)
+  clientId    String? @db.VarChar(255)
+
+  inProcessEvent InProcessEvent?
+}
+
+model FailedJob {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique") @db.VarChar(255)
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failedAt   DateTime @default(now()) @map("failed_at") @db.Timestamp(0)
+
+  @@map("failed_jobs")
+}
+
+model FaqAndResource {
+  id           BigInt                 @id @default(autoincrement()) @db.UnsignedBigInt
+  title        String                 @db.VarChar(255)
+  description  String                 @db.Text
+  type         faq_and_resources_type
+  displayOrder Boolean?               @default(true) @map("display_order")
+  media        String?                @db.VarChar(255)
+  createdAt    DateTime?              @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime?              @map("updated_at") @db.Timestamp(0)
+  createdBy    String?                @map("created_by") @db.VarChar(255)
+  updatedBy    String?                @map("updated_by") @db.VarChar(255)
+
+  @@map("faq_and_resources")
+}
+
+model Jobs {
+  id          BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  queue       String @db.VarChar(255)
+  payload     String @db.LongText
+  attempts    Int    @db.UnsignedTinyInt
+  reservedAt  Int?   @map("reserved_at") @db.UnsignedInt
+  availableAt Int    @map("available_at") @db.UnsignedInt
+  createdAt   Int    @map("created_at") @db.UnsignedInt
+
+  @@index([queue], map: "jobs_queue_index")
+  @@map("jobs")
+}
+
+model Migration {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String @db.VarChar(255)
+  batch     Int
+
+  @@map("migrations")
+}
+
+model ModuleRole {
+  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  moduleCode   String    @map("module_code") @db.VarChar(255)
+  roldeId      BigInt    @map("role_id") @db.UnsignedBigInt
+  addAccess    Boolean?  @map("add_access")
+  editAccess   Boolean?  @map("edit_access")
+  viewAccess   Boolean?  @map("view_access")
+  deleteAccess Boolean?  @map("delete_access")
+  createdAt    DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime? @map("updated_at") @db.Timestamp(0)
+  createdBy    String?   @map("created_by") @db.VarChar(255)
+  updatedBy    String?   @map("updated_by") @db.VarChar(255)
+  modules      Module    @relation(fields: [moduleCode], references: [code], onDelete: Cascade, onUpdate: NoAction, map: "module_roles_module_code_foreign")
+  roles        Role      @relation(fields: [roldeId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "module_roles_role_id_foreign")
+
+  @@index([moduleCode], map: "module_roles_module_code_foreign")
+  @@index([roldeId], map: "module_roles_role_id_foreign")
+  @@map("module_roles")
+}
+
+model Module {
+  code         String       @id @db.VarChar(64)
+  name         String       @db.VarChar(255)
+  isActive     Boolean      @default(true) @map("is_active")
+  parentCode   String?      @map("parent_code") @db.VarChar(255)
+  singularName String?      @map("singular_name") @db.VarChar(156)
+  pluralName   String?      @map("plural_name") @db.VarChar(156)
+  displayOrder Int?         @map("display_order")
+  isMenu       Boolean?     @map("is_menu")
+  isView       Boolean?     @map("is_view")
+  isAdd        Boolean?     @map("is_add")
+  isUpdate     Boolean?     @map("is_update")
+  isDelete     Boolean?     @map("is_delete")
+  createdAt    DateTime?    @map("created_at") @db.Timestamp(0)
+  updatedAt    DateTime?    @map("updated_at") @db.Timestamp(0)
+  moduleRoles  ModuleRole[]
+
+  @@map("modules")
+}
+
+model NotificationUser {
+  id             BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  notificationId BigInt       @map("notification_id") @db.UnsignedBigInt
+  userId         BigInt       @map("user_id") @db.UnsignedBigInt
+  isRead         Boolean      @default(false) @map("is_read")
+  createdAt      DateTime?    @map("created_at") @db.Timestamp(0)
+  updatedAt      DateTime?    @map("updated_at") @db.Timestamp(0)
+  notifications  Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_users_notification_id_foreign")
+  users          User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "notification_users_user_id_foreign")
+
+  @@index([notificationId], map: "notification_users_notification_id_foreign")
+  @@index([userId], map: "notification_users_user_id_foreign")
+  @@map("notification_users")
+}
+
+model Notification {
+  id                BigInt             @id @default(autoincrement()) @db.UnsignedBigInt
+  title             String             @db.VarChar(500)
+  description       String             @db.VarChar(1000)
+  createdAt         DateTime?          @map("created_at") @db.Timestamp(0)
+  updatedAt         DateTime?          @map("updated_at") @db.Timestamp(0)
+  createdBy         String?            @map("created_by") @db.VarChar(255)
+  updatedBy         String?            @map("updated_by") @db.VarChar(255)
+  notificationUsers NotificationUser[]
+
+  @@map("notifications")
+}
+
+model Package {
+  id                   Int                   @id @default(autoincrement()) @db.UnsignedInt
+  title                String                @db.VarChar(255)
+  subTitle             String                @map("sub_title") @db.VarChar(255)
+  tag                  String?               @db.VarChar(255)
+  displayOrder         Int?                  @map("display_order")
+  picture              String?               @db.VarChar(255)
+  description          String                @db.Text
+  createdAt            DateTime?             @map("created_at") @db.Timestamp(0)
+  updatedAt            DateTime?             @map("updated_at") @db.Timestamp(0)
+  availabilityRequests AvailabilityRequest[]
+  events               Event[]
+  inProcessEvents      InProcessEvent[]
+
+  @@map("packages")
+}
+
+model PersonalAccessToken {
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  tokenableType String    @map("tokenable_type") @db.VarChar(255)
+  tokenableId   BigInt    @map("tokenable_id") @db.UnsignedBigInt
+  name          String    @db.VarChar(255)
+  token         String    @unique(map: "personal_access_tokens_token_unique") @db.VarChar(64)
+  abilities     String?   @db.Text
+  lastUsedAt    DateTime? @map("last_used_at") @db.Timestamp(0)
+  createdAt     DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime? @map("updated_at") @db.Timestamp(0)
+  user          User      @relation(fields: [tokenableId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "personal_access_tokens_tokenable_id_foreign")
+
+  @@index([tokenableType, tokenableId], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
+  @@map("personal_access_tokens")
+}
+
+model Role {
+  id          BigInt       @id @default(autoincrement()) @db.UnsignedBigInt
+  name        String       @unique(map: "roles_name_unique") @db.VarChar(156)
+  description String?      @db.VarChar(256)
+  isActive    Boolean      @default(true) @map("is_active")
+  createdAt   DateTime?    @map("created_at") @db.Timestamp(0)
+  updatedAt   DateTime?    @map("updated_at") @db.Timestamp(0)
+  createdBy   String?      @map("created_by") @db.VarChar(255)
+  updatedBy   String?      @map("updated_by") @db.VarChar(255)
+  moduleRoles ModuleRole[]
+  users       User[]
+
+  @@map("roles")
+}
+
+model State {
+  id                   Int                   @id @default(autoincrement()) @db.UnsignedInt
+  name                 String                @db.VarChar(255)
+  isActive             Boolean               @default(false) @map("is_active")
+  createdAt            DateTime?             @map("created_at") @db.Timestamp(0)
+  updatedAt            DateTime?             @map("updated_at") @db.Timestamp(0)
+  availabilityRequests AvailabilityRequest[]
+  eventVenueDetails    EventVenueDetail[]
+  events               Event[]
+  inProcessEvents      InProcessEvent[]
+
+  @@map("states")
+}
+
+model TicketImage {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  ticketId  BigInt    @map("ticket_id") @db.UnsignedBigInt
+  url       String    @db.VarChar(255)
+  createdBy String?   @map("created_by") @db.VarChar(255)
+  updatedBy String?   @map("updated_by") @db.VarChar(255)
+  createdAt DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime? @map("updated_at") @db.Timestamp(0)
+  tickets   Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ticket_images_ticket_id_foreign")
+
+  @@index([ticketId], map: "ticket_images_ticket_id_foreign")
+  @@map("ticket_images")
+}
+
+model TicketRequestType {
+  id        BigInt                    @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String                    @db.VarChar(255)
+  type      ticket_request_types_type
+  createdAt DateTime?                 @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime?                 @map("updated_at") @db.Timestamp(0)
+  tickets   Ticket[]
+
+  @@map("ticket_request_types")
+}
+
+model TicketTrail {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  ticketId   BigInt    @map("ticket_id") @db.UnsignedBigInt
+  replayFrom BigInt    @map("replay_from") @db.UnsignedBigInt
+  message    String?   @db.VarChar(255)
+  image      String?   @db.VarChar(255)
+  isRead     Boolean   @default(false) @map("is_read")
+  createdBy  String?   @map("created_by") @db.VarChar(255)
+  updatedBy  String?   @map("updated_by") @db.VarChar(255)
+  createdAt  DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime? @map("updated_at") @db.Timestamp(0)
+  users      User      @relation(fields: [replayFrom], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ticket_trails_replay_from_foreign")
+  tickets    Ticket    @relation(fields: [ticketId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ticket_trails_ticket_id_foreign")
+
+  @@index([replayFrom], map: "ticket_trails_replay_from_foreign")
+  @@index([ticketId], map: "ticket_trails_ticket_id_foreign")
+  @@map("ticket_trails")
+}
+
+model Ticket {
+  id                 BigInt              @id @default(autoincrement()) @db.UnsignedBigInt
+  userId             BigInt              @map("user_id") @db.UnsignedBigInt
+  ticketNumber       String              @map("ticket_number") @db.VarChar(255)
+  title              String              @db.VarChar(255)
+  description        String              @db.LongText
+  status             tickets_status      @default(open)
+  ticketType         tickets_ticket_type @map("ticket_type")
+  eventId            BigInt?             @map("event_id") @db.UnsignedBigInt
+  typeId             BigInt?             @map("type_id") @db.UnsignedBigInt
+  createdBy          String?             @map("created_by") @db.VarChar(255)
+  updatedBy          String?             @map("updated_by") @db.VarChar(255)
+  createdAt          DateTime?           @map("created_at") @db.Timestamp(0)
+  updatedAt          DateTime?           @map("updated_at") @db.Timestamp(0)
+  ticketImages       TicketImage[]
+  ticketTrails       TicketTrail[]
+  events             Event?              @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "tickets_event_id_foreign")
+  ticketRequestTypes TicketRequestType?  @relation(fields: [typeId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "tickets_type_id_foreign")
+  users              User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "tickets_user_id_foreign")
+
+  @@index([eventId], map: "tickets_event_id_foreign")
+  @@index([typeId], map: "tickets_type_id_foreign")
+  @@index([userId], map: "tickets_user_id_foreign")
+  @@map("tickets")
+}
+
+model UserDetail {
+  id               BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId           BigInt    @map("user_id") @db.UnsignedBigInt
+  address          String?   @db.Text
+  designation      String?   @db.VarChar(255)
+  partnerAgreement String?   @map("partner_agreement") @db.VarChar(255)
+  countryId        BigInt?   @map("country_id") @db.UnsignedBigInt
+  state            String?   @db.VarChar(255)
+  city             String?   @db.VarChar(255)
+  zipcode          String?   @db.VarChar(15)
+  createdAt        DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt        DateTime? @map("updated_at") @db.Timestamp(0)
+  countries        Country?  @relation(fields: [countryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_details_country_id_foreign")
+  users            User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_details_user_id_foreign")
+
+  @@index([countryId], map: "user_details_country_id_foreign")
+  @@index([userId], map: "user_details_user_id_foreign")
+  @@map("user_details")
+}
+
+model UserEventToken {
+  id        BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  userId    BigInt    @map("user_id") @db.UnsignedBigInt
+  token     String    @db.VarChar(64)
+  eventId   BigInt    @map("event_id") @db.UnsignedBigInt
+  createdAt DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime? @map("updated_at") @db.Timestamp(0)
+  users     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_event_tokens_user_id_foreign")
+
+  @@index([userId], map: "user_event_tokens_user_id_foreign")
+  @@map("user_event_tokens")
+}
+
+model UserSignup {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  email             String?   @db.VarChar(255)
+  firstName         String?   @map("first_name") @db.VarChar(255)
+  lastName          String?   @map("last_name") @db.VarChar(255)
+  phoneNumber       String?   @map("phone_number") @db.VarChar(255)
+  eventId           String?   @map("event_id") @db.VarChar(255)
+  verificationToken String?   @map("verification_token") @db.VarChar(64)
+  createdAt         DateTime? @map("created_at") @db.Timestamp(0)
+  updatedAt         DateTime? @map("updated_at") @db.Timestamp(0)
+
+  @@map("user_signups")
+}
+
+model User {
+  id                                                BigInt                       @id @default(autoincrement()) @db.UnsignedBigInt
+  firstName                                         String                       @map("first_name") @db.VarChar(255)
+  lastName                                          String                       @map("last_name") @db.VarChar(255)
+  type                                              users_type                   @default(customer)
+  phoneNumber                                       String?                      @map("phone_number") @db.VarChar(11)
+  picture                                           String?                      @db.VarChar(255)
+  company                                           String?                      @unique(map: "users_company_unique") @db.VarChar(50)
+  isActive                                          Boolean                      @default(true) @map("is_active")
+  roldeId                                           BigInt?                      @map("role_id") @db.UnsignedBigInt
+  partnerId                                         BigInt?                      @map("partner_id") @db.UnsignedBigInt
+  inviteToken                                       String?                      @map("invite_token") @db.VarChar(64)
+  isFirstLogin                                      Boolean?                     @map("is_first_login")
+  invitationStatus                                  users_invitation_status?     @default(invited) @map("invitation_status")
+  email                                             String                       @unique(map: "users_email_unique") @db.VarChar(255)
+  password                                          String                       @db.VarChar(255)
+  rememberToken                                     String?                      @map("remember_token") @db.VarChar(100)
+  fcmCode                                           String?                      @map("fcm_code") @db.VarChar(255)
+  createdAt                                         DateTime?                    @map("created_at") @db.Timestamp(0)
+  updatedAt                                         DateTime?                    @map("updated_at") @db.Timestamp(0)
+  lastSeen                                          DateTime?                    @map("last_seen") @db.Timestamp(0)
+  moduleFlag                                        Boolean                      @default(false) @map("module_flag")
+  verificationToken                                 String?                      @map("verification_token") @db.VarChar(64)
+  availabilityRequestPartners                       AvailabilityRequestPartner[]
+  chatRoomMessagesChatRoomMessagesReceiverIdTousers ChatRoomMessage[]            @relation("chat_room_messages_receiver_idTousers")
+  chatRoomMessagesChatRoomMessagesSenderIdTousers   ChatRoomMessage[]            @relation("chat_room_messages_sender_idTousers")
+  countryPartners                                   CountryPartner[]
+  customerNotifications                             CustomerNotification[]
+  eventsEventsHostIdTousers                         Event[]                      @relation("events_host_idTousers")
+  eventsEventsPartnerIdTousers                      Event[]                      @relation("events_partner_idTousers")
+  eventsEventsUserIdTousers                         Event[]                      @relation("events_user_idTousers")
+  notificationUsers                                 NotificationUser[]
+  ticketTrails                                      TicketTrail[]
+  tickets                                           Ticket[]
+  userDetails                                       UserDetail[]
+  userEventTokens                                   UserEventToken[]
+  users                                             User?                        @relation("usersTousers", fields: [partnerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_partner_id_foreign")
+  otherUsers                                        User[]                       @relation("usersTousers")
+  roles                                             Role?                        @relation(fields: [roldeId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_role_id_foreign")
+  personalAccessTokens                              PersonalAccessToken[]
+
+  @@index([partnerId], map: "users_partner_id_foreign")
+  @@index([roldeId], map: "users_role_id_foreign")
+  @@map("users")
+}
+
+model PromotionalCode {
+  code         String   @id @db.VarChar(255)
+  discount     Int      @db.UnsignedInt
+  isPercentage Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  isOneTime    Boolean  @default(true)
+  expiresAt    DateTime @db.Timestamp(0)
+  events       Event[]
+}
+
+model VenueClosestMarket {
+  venue    String @id @db.VarChar(255)
+  distance Int    @db.UnsignedInt
+  marketId String @db.VarChar(255)
+}
+
+enum StripePaymentEnum {
+  canceled
+  processing
+  requires_action
+  requires_capture
+  requires_confirmation
+  requires_payment_method
+  succeeded
+}
+
+enum chat_rooms_type {
+  admin_partner
+  admin_customer
+  partner_customer
+}
+
+enum ticket_request_types_type {
+  customer
+  partner
+}
+
+enum availability_request_partners_status {
+  pending
+  available
+  unavailable
+}
+
+enum event_preferences_type {
+  type
+  category
+  reach_via
+  market
+  filter
+  orientation
+  design
+  backdrop
+}
+
+enum faq_and_resources_type {
+  faq
+  resources
+  video
+}
+
+enum users_type {
+  superadmin
+  member
+  partner
+  partneruser
+  customer
+}
+
+enum chat_room_messages_sender_type {
+  superadmin
+  member
+  partner
+  partneruser
+  customer
+}
+
+enum availability_request_partners_reason_type {
+  unavailable_staff
+  out_of_service_area
+  unavailable_equipment
+  other
+}
+
+enum chat_room_messages_receiver_type {
+  superadmin
+  member
+  partner
+  partneruser
+  customer
+}
+
+enum tickets_status {
+  open
+  inprogress
+  close
+}
+
+enum customer_notifications_type {
+  event
+  message
+}
+
+enum event_setup_details_is_parking_available {
+  yes
+  no
+}
+
+enum tickets_ticket_type {
+  partner
+  customer
+}
+
+enum event_setup_details_setup_location {
+  indoor
+  outdoor
+}
+
+enum event_setup_details_available_for_setup {
+  yes
+  no
+}
+
+enum event_setup_details_is_elevator_available {
+  yes
+  no
+  not_needed
+}
+
+enum event_venue_details_is_elevator_available {
+  yes
+  no
+}
+
+enum event_venue_details_COI {
+  send
+  not_require
+  require_custom
+  not_sure
+}
+
+enum users_invitation_status {
+  invited
+  accepted
+  rejected
+}
+
+enum events_is_event_planner {
+  yes
+  no
+}
+
+enum events_is_holder_on_reservation {
+  yes
+  no
+}
+
+enum events_admin_status {
+  invite
+  awaiting
+  detail_recieved
+  in_planning
+  awaiting_for_host
+  ready_to_execute
+  serviced
+  cancelled
+  confirmed
+}
+
+enum events_customer_status {
+  awaiting
+  processing
+  in_planning
+  final_planning
+  ready_to_service
+  serviced
+  cancelled
+  confirmed
+}
+
+enum event_payment_status {
+  pending
+  completed
+  holded
+  one_of_two
+}
+
+enum event_payment_plan {
+  full
+  partial_50_50
+}
+
+enum BookingType {
+  contactUs
+  manuaInvoice
+  bookingFlow
+
+  @@map("booking_type")
+}
+
+enum invoice_type {
+  deposit
+  final_balance
+  add_on
+}
